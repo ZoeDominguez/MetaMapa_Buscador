@@ -21,7 +21,7 @@ public class SearchController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<BusquedaDTO>> search(
-            @RequestParam("q") String keyword,
+            @RequestParam("keyword") String keyword,
             @RequestParam(value = "tag", required = false) String tag,
             Pageable pageable) { 
         
