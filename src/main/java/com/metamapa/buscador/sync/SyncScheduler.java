@@ -103,7 +103,7 @@ public class SyncScheduler {
                 doc.setInfoExterna(sbInfoExterna.toString().trim());
                 doc.setEtiquetas(etiquetasHecho);
 
-                Optional<Resultados_Documento> existente = repo.findByHechoid(doc.getHecho_id());
+                Optional<Resultados_Documento> existente = repo.findByHecho_id(doc.getHecho_id());
 
                 if (existente.isPresent()) {
                     Resultados_Documento original = existente.get();
