@@ -34,7 +34,7 @@ public class Resultados_Documento {
 
     private String origen;
 
-    private boolean ocultoPorSolicitud;
+    private boolean ocultoPorSolicitud=false;
     
     // descripciones y lugares de los PdIs concatenados
     private String infoPdi; 
