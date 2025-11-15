@@ -18,6 +18,8 @@ public class Resultados_Documento {
     @Id
     private String id;
 
+    private String hecho_id;
+
     private String nombre_coleccion;
 
     private String titulo;    
