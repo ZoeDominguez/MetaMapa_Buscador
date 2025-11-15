@@ -37,8 +37,8 @@ public class SyncScheduler {
         }).start();
     }
 
-    /** ✔ Se ejecuta cada minuto)*/
-    @Scheduled(fixedRate = 60 * 1000)
+    /** ✔ Se ejecuta cada 2 minutos)*/
+    @Scheduled(fixedRate = 2 * 60 * 1000)
     public void syncPeriodica() {
         System.out.println(">>> Ejecutando sincronización periódica...");
         sincronizar();
