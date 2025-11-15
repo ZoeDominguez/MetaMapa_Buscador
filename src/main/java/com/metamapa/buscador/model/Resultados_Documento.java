@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
@@ -18,7 +19,9 @@ public class Resultados_Documento {
     @Id
     private String id;
 
-    private String hecho_id;
+    @Field("hecho_id")
+    private String hechoId;
+
 
     private String nombre_coleccion;
 

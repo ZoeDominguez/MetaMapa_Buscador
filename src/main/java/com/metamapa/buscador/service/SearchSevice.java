@@ -25,8 +25,10 @@ public class SearchSevice {
        
         TextCriteria criteria = TextCriteria.forDefaultLanguage().matching(keyword);
         Query textQuery = TextQuery.queryText(criteria).sortByScore().with(pageable);
-    
-        
+
+        textQuery.addCriteria(Criteria.where("ocultoPorSolicitud").ne(true));
+
+
         if (tag != null) {
             textQuery.addCriteria(Criteria.where("etiquetas").is(tag));
         }
@@ -37,7 +39,7 @@ public class SearchSevice {
 
         Query countQuery = TextQuery.queryText(criteria);
 
-        countQuery.addCriteria(Criteria.where("ocultoPorSolicitud").is(false));
+        countQuery.addCriteria(Criteria.where("ocultoPorSolicitud").ne(true));
 
         if (StringUtils.hasText(tag)) {
             countQuery.addCriteria(Criteria.where("etiquetas").is(tag));
@@ -50,7 +52,7 @@ public class SearchSevice {
     }
 
     public void ocultarResultadosPorHecho(String hechoId) {
-        Query query = new Query(Criteria.where("hecho_id").is(hechoId));
+        Query query = new Query(Criteria.where("hechoId").is(hechoId));
         Update update = new Update().set("ocultoPorSolicitud", true);
 
         mongoTemplate.updateMulti(query, update, Resultados_Documento.class);

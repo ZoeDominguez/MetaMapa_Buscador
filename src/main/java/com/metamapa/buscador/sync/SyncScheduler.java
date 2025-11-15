@@ -65,7 +65,9 @@ public class SyncScheduler {
             int procesados = 0;
 
             for (Resultados_Documento doc : hechos) {
-                
+
+                doc.setHechoId(doc.getId());
+
                 // Inicializar listas y buffers
                 StringBuilder sbInfoPdi = new StringBuilder();
                 StringBuilder sbInfoExterna = new StringBuilder();
@@ -108,7 +110,6 @@ public class SyncScheduler {
                 if (existente.isPresent()) {
                     Resultados_Documento original = existente.get();
                     doc.setId(original.getId());
-                    doc.setHecho_id(original.getHecho_id());
                     doc.setOcultoPorSolicitud(original.isOcultoPorSolicitud());
                     System.out.println(">> Actualizando hecho existente por título: " + doc.getTitulo());
                 } else {
