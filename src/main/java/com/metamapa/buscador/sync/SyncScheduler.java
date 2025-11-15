@@ -1,29 +1,30 @@
 package com.metamapa.buscador.sync;
 
+import com.metamapa.buscador.client.AgregadorClient; // Asegúrate de importar el cliente
 import com.metamapa.buscador.model.Resultados_Documento;
+import com.metamapa.buscador.dto.PdiFuenteDTO;
 import com.metamapa.buscador.repository.ResultadosDocumentoRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
-
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Component
 public class SyncScheduler {
 
-    private final RestTemplate restTemplate;
+    private final AgregadorClient agregadorClient;
     private final ResultadosDocumentoRepository repo;
 
-    public SyncScheduler(ResultadosDocumentoRepository repo) {
-        this.restTemplate = new RestTemplate();
+    public SyncScheduler(ResultadosDocumentoRepository repo, AgregadorClient agregadorClient) {
         this.repo = repo;
+        this.agregadorClient = agregadorClient;
     }
 
-    /** ✔ Se ejecuta cuando la app está completamente levantada */
     @EventListener(org.springframework.boot.context.event.ApplicationReadyEvent.class)
     public void syncInicial() {
         new Thread(() -> {
@@ -37,7 +38,6 @@ public class SyncScheduler {
         }).start();
     }
 
-    /** ✔ Se ejecuta cada 2 minutos)*/
     @Scheduled(fixedRate = 2 * 60 * 1000)
     public void syncPeriodica() {
         System.out.println(">>> Ejecutando sincronización periódica...");
@@ -46,43 +46,82 @@ public class SyncScheduler {
 
     private void sincronizar() {
         try {
-            String url = "https://two025-tp-entrega-2-zoedominguez-bsuh.onrender.com/hechos";
-            Resultados_Documento[] respuesta = restTemplate.getForObject(url, Resultados_Documento[].class);
-    
-            if (respuesta == null) {
-                System.err.println("El agregador devolvió null.");
+            // Obtener Hechos
+            List<Resultados_Documento> hechos = agregadorClient.obtenerHechos();
+            if (hechos.isEmpty()) {
+                System.out.println("No se encontraron hechos para sincronizar.");
                 return;
             }
-    
-            List<Resultados_Documento> lista = Arrays.asList(respuesta);
-            int nuevos = 0;
-    
-            for (Resultados_Documento doc : lista) {
-    
-                System.out.println("----- DOCUMENTO RECIBIDO -----");
-                System.out.println("ID: " + doc.getId());
-                System.out.println("TITULO: " + doc.getTitulo());
-    
-                // boolean existsId = repo.existsById(doc.getId());
-                // boolean existsTitulo = repo.existsByTitulo(doc.getTitulo());
-    
-                // System.out.println("¿Existe ID? " + existsId);
-                // System.out.println("¿Existe Titulo? " + existsTitulo);
-    
-                // if (existsId || existsTitulo) {
-                //     System.out.println(">> Saltando, ya existe.");
-                //     continue;
-                // }
-    
+
+            // Obtener PDIs
+            List<PdiFuenteDTO> pdis = agregadorClient.obtenerPdis();
+            System.out.println("PDIs encontrados: " + pdis.size());
+
+            // Agrupar PDIs por su hechoId para acceso rápido
+            Map<String, List<PdiFuenteDTO>> pdisPorHecho = pdis.stream()
+                    .filter(p -> p.getHechoId() != null)
+                    .collect(Collectors.groupingBy(PdiFuenteDTO::getHechoId));
+
+            int procesados = 0;
+
+            for (Resultados_Documento doc : hechos) {
+                
+                // Inicializar listas y buffers
+                StringBuilder sbInfoPdi = new StringBuilder();
+                StringBuilder sbInfoExterna = new StringBuilder();
+                List<String> etiquetasHecho = doc.getEtiquetas() != null ? doc.getEtiquetas() : new ArrayList<>();
+
+                // Buscar PDIs relacionados a este hecho
+                List<PdiFuenteDTO> misPdis = pdisPorHecho.getOrDefault(doc.getId(), new ArrayList<>());
+
+                for (PdiFuenteDTO pdi : misPdis) {
+                    // Concatenar descripción y lugar del PDI para búsqueda
+                    if (pdi.getDescripcion() != null) {
+                        sbInfoPdi.append(pdi.getDescripcion()).append(" ");
+                    }
+                    if (pdi.getLugar() != null) {
+                        sbInfoPdi.append(pdi.getLugar()).append(" ");
+                    }
+
+                    // Concatenar Texto de Imagen (OCR) para búsqueda
+                    if (pdi.getTextoImagen() != null) {
+                        sbInfoExterna.append(pdi.getTextoImagen()).append(" ");
+                    }
+
+                    // Fusionar etiquetas
+                    if (pdi.getEtiquetas() != null) {
+                        for (String tag : pdi.getEtiquetas()) {
+                            if (!etiquetasHecho.contains(tag)) {
+                                etiquetasHecho.add(tag);
+                            }
+                        }
+                    }
+                }
+
+                // Asignar los datos procesados al documento del Hecho
+                doc.setInfoPdi(sbInfoPdi.toString().trim());
+                doc.setInfoExterna(sbInfoExterna.toString().trim());
+                doc.setEtiquetas(etiquetasHecho);
+
+                Optional<Resultados_Documento> existente = repo.findByTitulo(doc.getTitulo());
+
+                if (existente.isPresent()) {
+                    doc.setId(existente.get().getId());
+                    System.out.println(">> Actualizando hecho existente por título: " + doc.getTitulo());
+                } else {
+                    System.out.println(">> Insertando nuevo hecho: " + doc.getTitulo());
+                }
+
+                // Guardar
                 repo.save(doc);
-                nuevos++;
+                procesados++;
             }
-    
-            System.out.println("✔ Sincronización completada. Hechos agregados: " + nuevos);
-    
+
+            System.out.println("✔ Sincronización completada. Documentos procesados e indexados: " + procesados);
+
         } catch (Exception e) {
-            System.err.println("Error sincronizando desde agregador: " + e.getMessage());
+            System.err.println("Error crítico en proceso de sincronización: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    
 }
