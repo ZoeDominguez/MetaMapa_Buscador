@@ -25,8 +25,7 @@ public class SearchSevice {
        
         TextCriteria criteria = TextCriteria.forDefaultLanguage().matching(keyword);
         Query textQuery = TextQuery.queryText(criteria).sortByScore().with(pageable);
-        
-        textQuery.addCriteria(Criteria.where("deleted").is(false));
+    
         
         if (tag != null) {
             textQuery.addCriteria(Criteria.where("etiquetas").is(tag));
@@ -38,7 +37,6 @@ public class SearchSevice {
 
         Query countQuery = TextQuery.queryText(criteria);
 
-        countQuery.addCriteria(Criteria.where("deleted").is(false));
         countQuery.addCriteria(Criteria.where("ocultoPorSolicitud").is(false));
 
         if (StringUtils.hasText(tag)) {
