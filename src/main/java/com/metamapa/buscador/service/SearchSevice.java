@@ -8,10 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.TextCriteria;
-import org.springframework.data.mongodb.core.query.TextQuery;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -36,10 +33,14 @@ public class SearchSevice {
         }
         
 
+
         List<Resultados_Documento> docs = mongoTemplate.find(textQuery, Resultados_Documento.class);
 
         Query countQuery = TextQuery.queryText(criteria);
+
         countQuery.addCriteria(Criteria.where("deleted").is(false));
+        countQuery.addCriteria(Criteria.where("ocultoPorSolicitud").is(false));
+
         if (StringUtils.hasText(tag)) {
             countQuery.addCriteria(Criteria.where("etiquetas").is(tag));
         }
@@ -48,6 +49,13 @@ public class SearchSevice {
         List<BusquedaDTO> dtos = docs.stream().map(this::convertirADTO).collect(Collectors.toList());
 
         return new PageImpl<>(dtos, pageable, total);
+    }
+
+    public void ocultarResultadosPorHecho(String hechoId) {
+        Query query = new Query(Criteria.where("hechoId").is(hechoId));
+        Update update = new Update().set("ocultoPorSolicitud", true);
+
+        mongoTemplate.updateMulti(query, update, Resultados_Documento.class);
     }
 
     private BusquedaDTO convertirADTO(Resultados_Documento doc) {

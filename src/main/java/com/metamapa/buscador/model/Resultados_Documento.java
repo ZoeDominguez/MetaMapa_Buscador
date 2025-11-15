@@ -32,5 +32,6 @@ public class Resultados_Documento {
 
     private String origen;
 
-    private boolean deleted = false;
+    private boolean ocultoPorSolicitud = false;
+
 }

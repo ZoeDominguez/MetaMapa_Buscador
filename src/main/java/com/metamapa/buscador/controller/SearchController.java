@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.metamapa.buscador.dto.BusquedaDTO;
 import com.metamapa.buscador.service.SearchSevice;
@@ -27,5 +24,11 @@ public class SearchController {
         
         Page<BusquedaDTO> results = searchService.buscar(keyword, tag, pageable);
         return ResponseEntity.ok(results);
+    }
+
+    @PatchMapping("/ocultar/hecho/{hechoId}")
+    public ResponseEntity<Void> ocultarPorHecho(@PathVariable String hechoId) {
+        searchService.ocultarResultadosPorHecho(hechoId);
+        return ResponseEntity.noContent().build();
     }
 }
