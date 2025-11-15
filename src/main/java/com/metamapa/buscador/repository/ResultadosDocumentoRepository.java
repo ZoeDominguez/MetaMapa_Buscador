@@ -8,4 +8,5 @@ public interface ResultadosDocumentoRepository extends MongoRepository<Resultado
 
     // Cambiamos de boolean a Optional para obtener el objeto si existe
     Optional<Resultados_Documento> findByTitulo(String titulo);
+    Optional<Resultados_Documento> findByTitulo(String hecho_id);
 }
