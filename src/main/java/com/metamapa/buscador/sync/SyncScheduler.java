@@ -106,8 +106,9 @@ public class SyncScheduler {
                 Optional<Resultados_Documento> existente = repo.findByTitulo(doc.getTitulo());
 
                 if (existente.isPresent()) {
-                    doc.setId(existente.get().getId());
-                    doc.setOcultoPorSolicitud(existente.get().getOcultoPorSolicitud());
+                    Resultados_Documento original = existente.get();
+                    doc.setId(original.getId());
+                    doc.setOcultoPorSolicitud(original.getOcultoPorSolicitud());
                     System.out.println(">> Actualizando hecho existente por título: " + doc.getTitulo());
                 } else {
                     System.out.println(">> Insertando nuevo hecho: " + doc.getTitulo());
