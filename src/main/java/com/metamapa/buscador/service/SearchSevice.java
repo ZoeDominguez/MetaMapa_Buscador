@@ -53,9 +53,9 @@ public class SearchSevice {
     private BusquedaDTO convertirADTO(Resultados_Documento doc) {
         BusquedaDTO dto = new BusquedaDTO();
         dto.setId(doc.getId());
-        dto.setNombre(doc.getTitulo());
+        dto.setTitulo(doc.getTitulo());
         dto.setDescripcion(doc.getDescripcion());
-        dto.setTags(doc.getEtiquetas());
+        dto.setEtiquetas(doc.getEtiquetas());
         return dto;
     }
 }

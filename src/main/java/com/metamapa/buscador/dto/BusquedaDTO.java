@@ -13,18 +13,18 @@ public class BusquedaDTO {
 
     private String id;
 
-    private String nombre;
+    private String titulo;
 
     private String descripcion;
 
-    private List<String> tags;
+    private List<String> etiquetas;
 
     public static BusquedaDTO from(Resultados_Documento doc) {
         BusquedaDTO dto = new BusquedaDTO();
         dto.id = doc.getId();
-        dto.nombre = doc.getTitulo();
+        dto.titulo = doc.getTitulo();
         dto.descripcion = doc.getDescripcion();
-        dto.tags = doc.getEtiquetas();
+        dto.etiquetas = doc.getEtiquetas();
         return dto;
     }
 }
