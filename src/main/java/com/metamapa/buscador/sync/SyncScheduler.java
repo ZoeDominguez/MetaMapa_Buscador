@@ -111,6 +111,7 @@ public class SyncScheduler {
                     doc.setOcultoPorSolicitud(original.isOcultoPorSolicitud());
                     System.out.println(">> Actualizando hecho existente por título: " + doc.getTitulo());
                 } else {
+                     doc.setOcultoPorSolicitud(false);
                     System.out.println(">> Insertando nuevo hecho: " + doc.getTitulo());
                 }
 
