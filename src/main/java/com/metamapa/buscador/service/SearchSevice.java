@@ -53,7 +53,8 @@ public class SearchSevice {
         Query query = new Query(Criteria.where("hechoId").is(hechoId));
         Update update = new Update().set("ocultoPorSolicitud", true);
 
-        mongoTemplate.updateMulti(query, update, Resultados_Documento.class);
+        UpdateResult result mongoTemplate.updateMulti(query, update, Resultados_Documento.class);
+        
     }
 
     private BusquedaDTO convertirADTO(Resultados_Documento doc) {
