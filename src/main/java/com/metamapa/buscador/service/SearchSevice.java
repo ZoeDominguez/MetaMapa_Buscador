@@ -50,7 +50,7 @@ public class SearchSevice {
     }
 
     public void ocultarResultadosPorHecho(String hechoId) {
-        Query query = new Query(Criteria.where("_id").is(hechoId));
+        Query query = new Query(Criteria.where("hecho_id").is(hechoId));
         Update update = new Update().set("ocultoPorSolicitud", true);
 
         mongoTemplate.updateMulti(query, update, Resultados_Documento.class);
