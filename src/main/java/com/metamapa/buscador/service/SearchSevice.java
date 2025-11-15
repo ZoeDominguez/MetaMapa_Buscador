@@ -53,7 +53,7 @@ public class SearchSevice {
         Query query = new Query(Criteria.where("hechoId").is(hechoId));
         Update update = new Update().set("ocultoPorSolicitud", true);
 
-        UpdateResult result mongoTemplate.updateMulti(query, update, Resultados_Documento.class);
+        UpdateResult result = mongoTemplate.updateMulti(query, update, Resultados_Documento.class);
         
     }
 
