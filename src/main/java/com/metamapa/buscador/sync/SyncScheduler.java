@@ -107,6 +107,7 @@ public class SyncScheduler {
 
                 if (existente.isPresent()) {
                     doc.setId(existente.get().getId());
+                    doc.setOcultoPorSolicitud(existente.get().getOcultoPorSolicitud());
                     System.out.println(">> Actualizando hecho existente por título: " + doc.getTitulo());
                 } else {
                     System.out.println(">> Insertando nuevo hecho: " + doc.getTitulo());
