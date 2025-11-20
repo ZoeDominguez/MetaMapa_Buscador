@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class SearchSevice {
     public Page<BusquedaDTO> buscar(String keyword, String tag, Pageable pageable) {
        
         TextCriteria criteria = TextCriteria.forDefaultLanguage().matching(keyword);
-        Query textQuery = TextQuery.queryText(criteria).sortByScore().with(pageable);
+        Query textQuery = TextQuery.queryText(criteria).sortByScore().with(Sort.by("titulo")).with(pageable);
 
         textQuery.addCriteria(Criteria.where("ocultoPorSolicitud").ne(true));
 
