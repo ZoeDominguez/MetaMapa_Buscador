@@ -27,8 +27,8 @@ public class SearchController {
     }
 
     @PatchMapping("/ocultar/hecho/{hechoId}")
-    public ResponseEntity<Void> ocultarPorHecho(@PathVariable String id) {
-        searchService.ocultarResultadosPorHecho(id);
+    public ResponseEntity<Void> ocultarPorHecho(@PathVariable String hechoId) {
+        searchService.ocultarResultadosPorHecho(hechoId);
         return ResponseEntity.noContent().build();
     }
 }
