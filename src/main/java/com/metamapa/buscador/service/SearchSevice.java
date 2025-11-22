@@ -30,10 +30,9 @@ public class SearchSevice {
         textQuery.addCriteria(Criteria.where("ocultoPorSolicitud").ne(true));
 
 
-        if (tag != null) {
-            textQuery.addCriteria(Criteria.where("etiquetas").is(tag));
+        if (StringUtils.hasText(tag)) {
+            textQuery.addCriteria(Criteria.where("etiquetas").in(tag));
         }
-        
 
 
         List<Resultados_Documento> docs = mongoTemplate.find(textQuery, Resultados_Documento.class);
@@ -43,7 +42,7 @@ public class SearchSevice {
         countQuery.addCriteria(Criteria.where("ocultoPorSolicitud").ne(true));
 
         if (StringUtils.hasText(tag)) {
-            countQuery.addCriteria(Criteria.where("etiquetas").is(tag));
+            countQuery.addCriteria(Criteria.where("etiquetas").in(tag));
         }
         long total = mongoTemplate.count(countQuery, Resultados_Documento.class);
 
